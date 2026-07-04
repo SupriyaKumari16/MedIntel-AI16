@@ -1,0 +1,235 @@
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
+
+ScrollTrigger.config({autoRefreshEvents:"load,DOMContentLoaded"});
+
+export const fadeUp=(el)=>{
+
+if(!el)return;
+
+const isMobile=window.innerWidth<768;
+
+gsap.fromTo(
+el,
+{
+opacity:0,
+y:isMobile?40:80,
+willChange:"transform,opacity",
+force3D:true
+},
+{
+opacity:1,
+y:0,
+duration:isMobile?.7:1,
+ease:"power3.out",
+clearProps:"willChange",
+scrollTrigger:{
+trigger:el,
+start:"top 92%",
+toggleActions:"play none none none",
+once:true
+}
+}
+);
+
+};
+
+
+
+export const staggerCards=(cards)=>{
+
+if(!cards?.length)return;
+
+const isMobile=window.innerWidth<768;
+
+gsap.fromTo(
+cards,
+{
+opacity:0,
+y:isMobile?20:30,
+scale:.98,
+willChange:"transform,opacity",
+force3D:true
+},
+{
+opacity:1,
+y:0,
+scale:1,
+duration:isMobile?.45:.55,
+stagger:.06,
+ease:"power2.out",
+clearProps:"willChange",
+scrollTrigger:{
+trigger:cards[0],
+start:isMobile?"top 100%":"top 99%",
+toggleActions:"play none none reverse"
+}
+}
+);
+
+};
+
+
+
+export const revealLetters=(letters)=>{
+
+if(!letters?.length)return;
+
+gsap.fromTo(
+letters,
+{
+opacity:0,
+y:80,
+rotateX:50
+},
+{
+opacity:1,
+y:0,
+rotateX:0,
+duration:.9,
+stagger:.06,
+ease:"power3.out",
+scrollTrigger:{
+trigger:letters[0],
+start:"top 95%",
+toggleActions:"play none none reverse"
+}
+}
+);
+
+};
+
+
+
+export const revealWords=(words)=>{
+
+if(!words?.length)return;
+
+gsap.fromTo(
+words,
+{
+opacity:0,
+y:40
+},
+{
+opacity:1,
+y:0,
+duration:.9,
+stagger:.1,
+ease:"power3.out",
+scrollTrigger:{
+trigger:words[0],
+start:"top 95%",
+toggleActions:"play none none reverse"
+}
+}
+);
+
+};
+
+
+
+export const maskReveal=(el)=>{
+
+if(!el)return;
+
+gsap.fromTo(
+el,
+{
+clipPath:"inset(0 100% 0 0)",
+opacity:0
+},
+{
+clipPath:"inset(0 0% 0 0)",
+opacity:1,
+duration:1,
+ease:"power3.out",
+scrollTrigger:{
+trigger:el,
+start:"top 90%",
+toggleActions:"play none none reverse"
+}
+}
+);
+
+};
+
+
+
+export const textReveal=(el)=>{
+
+if(!el)return;
+
+const isMobile=window.innerWidth<768;
+
+gsap.fromTo(
+el,
+{
+opacity:0,
+y:isMobile?40:120,
+willChange:"transform,opacity",
+force3D:true
+},
+{
+opacity:1,
+y:0,
+duration:isMobile?.65:1.1,
+ease:"power2.out",
+clearProps:"willChange",
+scrollTrigger:{
+trigger:el,
+start:isMobile?"top 95%":"top 92%",
+toggleActions:"play none none reverse"
+}
+}
+);
+
+};
+
+
+
+export const hoverCard=(card)=>{
+
+if(!card)return;
+
+card.addEventListener("mouseenter",()=>{
+
+gsap.to(
+card,
+{
+y:-10,
+scale:1.03,
+duration:.35,
+ease:"power2.out"
+}
+);
+
+});
+
+
+
+card.addEventListener("mouseleave",()=>{
+
+gsap.to(
+card,
+{
+y:0,
+scale:1,
+duration:.35,
+ease:"power2.out"
+}
+);
+
+});
+
+};
+
+
+
+setTimeout(()=>{
+
+ScrollTrigger.refresh();
+
+},500);

@@ -1,0 +1,499 @@
+@import "tailwindcss";
+
+/* ============================= */
+/* ROOT + SCREEN HEIGHT FIX */
+/* ============================= */
+
+html,
+body,
+#root {
+
+  width: 100%;
+
+  min-height: 100dvh;
+
+  margin: 0;
+
+  padding: 0;
+
+}
+
+
+
+/* ============================= */
+/* GLOBAL BODY */
+/* ============================= */
+
+html {
+
+  overflow-x: hidden;
+
+  overflow-y: auto;
+
+  scroll-behavior: auto;
+
+  scrollbar-width: none;
+
+  text-rendering:
+  optimizeLegibility;
+
+  -webkit-font-smoothing:
+  antialiased;
+
+  -moz-osx-font-smoothing:
+  grayscale;
+
+}
+
+
+
+body {
+
+  overflow-x: hidden;
+
+  background: white;
+
+  color: black;
+
+  font-family:
+
+  ui-sans-serif,
+
+  system-ui,
+
+  sans-serif;
+
+}
+
+
+
+/* ============================= */
+/* LENIS */
+/* ============================= */
+
+html.lenis {
+
+height:auto;
+
+}
+
+
+
+.lenis.lenis-smooth {
+
+scroll-behavior:
+auto !important;
+
+}
+
+
+
+.lenis.lenis-stopped {
+
+overflow:
+hidden;
+
+}
+
+
+
+/* ============================= */
+/* HIDE SCROLLBAR */
+/* ============================= */
+
+::-webkit-scrollbar {
+
+display:none;
+
+}
+
+
+
+/* ============================= */
+/* RESPONSIVE TEXT */
+/* ============================= */
+
+body{
+
+font-size:
+
+clamp(
+
+14px,
+
+1vw,
+
+17px
+
+);
+
+}
+
+
+
+/* ============================= */
+/* SECTION SPACING */
+/* ============================= */
+
+section{
+
+overflow-x:
+
+clip;
+
+}
+
+
+
+.section-spacing{
+
+padding-top:
+
+clamp(
+
+4rem,
+
+8vw,
+
+10rem
+
+);
+
+
+
+padding-bottom:
+
+clamp(
+
+4rem,
+
+8vw,
+
+10rem
+
+);
+
+}
+
+
+
+/* ============================= */
+/* CONTAINER */
+/* ============================= */
+
+.cinematic-container{
+
+max-width:
+
+1400px;
+
+
+margin:
+
+0 auto;
+
+
+
+padding-inline:
+
+clamp(
+
+1rem,
+
+3vw,
+
+2rem
+
+);
+
+}
+
+
+
+/* ============================= */
+/* SMOOTH RENDER */
+/* ============================= */
+
+img,
+video,
+canvas,
+.fade-up,
+.reveal-text{
+
+transform:
+
+translateZ(0);
+
+
+backface-visibility:
+
+hidden;
+
+
+will-change:
+
+transform,
+
+opacity;
+
+}
+
+
+
+/* ============================= */
+/* REVEAL */
+/* ============================= */
+
+.reveal-wrap{
+
+overflow:hidden;
+
+}
+
+
+
+.reveal-text{
+
+transform:
+
+translateY(
+
+110%
+
+);
+
+
+opacity:0;
+
+}
+
+
+
+.fade-up{
+
+transform:
+
+translateY(
+
+30px
+
+);
+
+
+opacity:0;
+
+}
+
+
+
+/* ============================= */
+/* SWIPER */
+/* ============================= */
+
+.continuous-swiper
+.swiper-wrapper{
+
+transition-timing-function:
+
+linear !important;
+
+}
+
+
+
+/* ============================= */
+/* ANIMATIONS */
+/* ============================= */
+
+@keyframes breathe{
+
+0%,100%{
+
+transform:
+
+scale(1);
+
+}
+
+
+
+50%{
+
+transform:
+
+scale(
+
+1.08
+
+);
+
+}
+
+}
+
+
+
+@keyframes ecgMove{
+
+0%{
+
+transform:
+
+translateX(
+
+-100%
+
+);
+
+}
+
+
+
+100%{
+
+transform:
+
+translateX(
+
+100%
+
+);
+
+}
+
+}
+
+
+
+
+@keyframes attractShake{
+
+0%{
+
+transform:
+
+translateX(0);
+
+}
+
+
+5%{
+
+transform:
+
+translateX(-6px);
+
+}
+
+
+
+10%{
+
+transform:
+
+translateX(6px);
+
+}
+
+
+
+15%{
+
+transform:
+
+translateX(-6px);
+
+}
+
+
+
+20%{
+
+transform:
+
+translateX(6px);
+
+}
+
+
+
+25%{
+
+transform:
+
+translateX(0);
+
+}
+
+
+
+100%{
+
+transform:
+
+translateX(0);
+
+}
+
+
+}
+
+
+
+.shake-cta{
+
+animation:
+
+attractShake
+
+1.5s
+
+infinite;
+
+}
+
+
+
+
+
+/* ============================= */
+/* MOBILE */
+/* ============================= */
+
+@media(
+
+max-width:
+
+768px
+
+){
+
+
+html,
+body{
+
+overflow-x:
+
+hidden;
+
+}
+
+
+
+.section-spacing{
+
+padding-top:
+
+4rem;
+
+
+
+padding-bottom:
+
+4rem;
+
+}
+
+
+
+}
