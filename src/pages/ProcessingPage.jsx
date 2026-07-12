@@ -42,12 +42,13 @@ Number(heartRate)>85
 
 return "LOW";
 };
-const risk=
-type==="initial"
-?
-"HIGH"
-:
-getRisk();
+const aiRisk =
+patient?.aiAnalysis?.riskLevel?.toUpperCase();
+
+const risk =
+aiRisk === "MODERATE"
+  ? "MEDIUM"
+  : aiRisk || getRisk();
 
 useEffect(()=>{
 const interval=
@@ -100,15 +101,22 @@ return()=>clearInterval(interval);
 useEffect(()=>{
 const timer=
 setTimeout(()=>{
-const reportData={
-...patient,
-risk,
-symptoms,
-heartRate,
-bp,
-oxygen,
-type
+const reportData = {
+  ...patient,
 
+  risk,
+
+  symptoms,
+
+  heartRate,
+
+  bp,
+
+  oxygen,
+
+  type,
+
+  aiAnalysis: patient?.aiAnalysis,
 };
 
 localStorage.setItem(
@@ -202,6 +210,18 @@ width:
 <p className="text-gray-500 text-sm">
 Current AI Prediction:
 </p>
+{
+type==="initial" &&
+patient?.aiAnalysis?.urgency && (
+<p className="text-sm text-gray-600 mt-2">
+Urgency :
+{" "}
+<b>
+{patient.aiAnalysis.urgency}
+</b>
+</p>
+)
+}
 
 <p className={`font-bold text-2xl sm:text-3xl ${
 risk==="HIGH"

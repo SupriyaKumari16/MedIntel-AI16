@@ -64,7 +64,7 @@ clearProps:"willChange",
 scrollTrigger:{
 trigger:cards[0],
 start:isMobile?"top 100%":"top 99%",
-toggleActions:"play none none reverse"
+once:true
 }
 }
 );
@@ -94,7 +94,7 @@ ease:"power3.out",
 scrollTrigger:{
 trigger:letters[0],
 start:"top 95%",
-toggleActions:"play none none reverse"
+once:true
 }
 }
 );
@@ -122,7 +122,7 @@ ease:"power3.out",
 scrollTrigger:{
 trigger:words[0],
 start:"top 95%",
-toggleActions:"play none none reverse"
+once:true
 }
 }
 );
@@ -149,7 +149,7 @@ ease:"power3.out",
 scrollTrigger:{
 trigger:el,
 start:"top 90%",
-toggleActions:"play none none reverse"
+once:true
 }
 }
 );
@@ -181,7 +181,7 @@ clearProps:"willChange",
 scrollTrigger:{
 trigger:el,
 start:isMobile?"top 95%":"top 92%",
-toggleActions:"play none none reverse"
+once:true
 }
 }
 );
@@ -228,8 +228,8 @@ ease:"power2.out"
 
 
 
-setTimeout(()=>{
+// setTimeout(()=>{
 
-ScrollTrigger.refresh();
+// ScrollTrigger.refresh();
 
-},500);
+// },500);

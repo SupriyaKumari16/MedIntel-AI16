@@ -12,6 +12,8 @@ const navigate=useNavigate();
 const patient=
 location.state||
 JSON.parse(localStorage.getItem("currentPatient"));
+const ai = patient?.aiAnalysis || {};
+const risk = ai?.riskLevel || patient?.risk;
 
 
 useEffect(()=>{
@@ -21,11 +23,11 @@ needleRef.current,
 {rotation:0},
 {
 rotation:
-patient?.risk==="LOW"
+risk === "LOW"
 ?
 20
 :
-patient?.risk==="MEDIUM"
+risk === "MEDIUM"
 ?
 45
 :
@@ -136,7 +138,7 @@ PT-0935
 
 <p><b>Appointment:</b> {patient?.appointmentType||"N/A"}</p>
 
-<p><b>Risk:</b> {patient?.risk}</p>
+<p><b>Risk:</b> {ai?.riskLevel || patient?.risk}</p>
 
 </div>
 
@@ -222,9 +224,7 @@ Vitals
 Risk Level:
 
 <span className="text-red-500 font-semibold ml-2">
-
-{patient?.risk}
-
+  {risk}
 </span>
 
 </p>
@@ -268,29 +268,40 @@ strokeWidth="5"
 
 <div className="bg-[#f5f8fb] p-5 rounded-xl">
 
-<h3 className="font-semibold mb-2">
+<h3 className="font-semibold mb-4">
 
-AI Explanation
+Final AI Report
 
 </h3>
 
-
 <p>
+<b>Diagnosis:</b>
+{" "}
+{ai?.diagnosis}
+</p>
 
-Based on:
+<p className="mt-3">
+<b>Recommendation:</b>
+{" "}
+{ai?.recommendation}
+</p>
 
-{patient?.symptoms}
+<p className="mt-3">
+<b>Prescription:</b>
+{" "}
+{ai?.prescription}
+</p>
 
-AI predicts:
+<p className="mt-3">
+<b>Follow Up:</b>
+{" "}
+{ai?.followUp}
+</p>
 
-<b>
-
-{patient?.risk}
-
-</b>
-
-risk.
-
+<p className="mt-3">
+<b>Doctor Notes:</b>
+{" "}
+{ai?.doctorNotes}
 </p>
 
 </div>
@@ -334,7 +345,7 @@ Doctor:
 
 Risk:
 
-{patient?.risk}
+{ai?.riskLevel || patient?.risk}
 
 </p>
 

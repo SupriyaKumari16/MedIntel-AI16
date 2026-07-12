@@ -20,55 +20,81 @@ export default function UploadReport() {
     return;
   }
 
-  try{
+  try {
 
-    const response = await fetch(
-      "http://localhost:5000/api/reports/create",
-      {
-        method:"POST",
-        headers:{
-          "Content-Type":"application/json",
-          Authorization:`Bearer ${token}`
-        },
-        body:JSON.stringify({
-          symptoms,
-          heartRate,
-          bp,
-          oxygen,
-          reportFile:file?.name || ""
-        })
-      }
-    );
-
-    const data = await response.json();
-
-    if(!response.ok){
-      alert(data.message);
-      return;
-    }
-
-    alert("Report Submitted Successfully");
-
-    navigate("/processing",{
-      state:{
-        type:"final",
+  // 1. AI Analysis
+  const aiResponse = await fetch(
+    "http://localhost:5000/api/final-ai/analyze-final",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
         symptoms,
         heartRate,
         bp,
         oxygen,
-        report:file?.name
-      }
-    });
+        reportFile: file?.name || "",
+      }),
+    }
+  );
 
+  const aiData = await aiResponse.json();
+
+  if (!aiResponse.ok) {
+    alert(aiData.message);
+    return;
   }
-  catch(error){
 
-    console.log(error);
+  // 2. Save Report
+  const response = await fetch(
+    "http://localhost:5000/api/reports/create",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        symptoms,
+        heartRate,
+        bp,
+        oxygen,
+        reportFile: file?.name || "",
+        aiAnalysis: aiData.analysis,
+      }),
+    }
+  );
 
-    alert("Server Error");
+  const data = await response.json();
 
+  if (!response.ok) {
+    alert(data.message);
+    return;
   }
 
+  alert("Report Submitted Successfully");
+
+  navigate("/processing", {
+    state: {
+      name: JSON.parse(localStorage.getItem("user"))?.name || "Patient",
+      type: "final",
+      symptoms,
+      heartRate,
+      bp,
+      oxygen,
+      report: file?.name,
+      aiAnalysis: aiData.analysis,
+    },
+  });
+
+}
+catch (error) {
+  console.log(error);
+  alert("Server Error");
+}
 };
 
   return (

@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FiSend, FiMail, FiUser } from "react-icons/fi";
 import { useForm } from "@formspree/react";
 
 const Support = () => {
-  const [state, handleSubmit] = useForm("meogakgz");
-
+  const [state, handleSubmit] = useForm("mwvgepjy");
+const [showSuccess, setShowSuccess] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -16,15 +16,24 @@ const Support = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  useEffect(() => {
   if (state.succeeded) {
-    return (
-      <section className="py-24 text-center bg-gradient-to-br from-teal-50 via-white to-teal-100">
-        <h2 className="text-3xl font-bold text-teal-600">
-          Support Request Sent ✅
-        </h2>
-      </section>
-    );
+    setShowSuccess(true);
+
+    const timer = setTimeout(() => {
+      setShowSuccess(false);
+
+      setFormData({
+        name: "",
+        email: "",
+        subject: "",
+        message: "",
+      });
+    }, 5000);
+
+    return () => clearTimeout(timer);
   }
+}, [state.succeeded]);
 
   return (
     <section id="support" className="py-24 px-4 sm:px-8 lg:px-16 xl:px-24 bg-gradient-to-br from-teal-50 via-white to-teal-100">
@@ -54,12 +63,24 @@ const Support = () => {
 
         {/* RIGHT FORM CARD */}
         <form
+        
           onSubmit={handleSubmit}
           className="relative p-6 sm:p-8 rounded-2xl bg-white border border-teal-200 
           shadow-[0_20px_60px_rgba(0,0,0,0.15)] 
           hover:shadow-[0_25px_80px_rgba(0,0,0,0.2)] 
           transition-all duration-300 w-full"
         >
+          
+          <input
+  type="hidden"
+  name="_subject"
+  value="MedIntel AI - New Support Request"
+/>
+          {showSuccess && (
+  <div className="mb-5 rounded-lg bg-green-100 border border-green-300 text-green-700 py-3 text-center font-semibold">
+    ✅ Support Request Sent Successfully
+  </div>
+)}
 
           {/* EMAIL */}
           <div className="relative mb-4">

@@ -28,7 +28,10 @@ staggerCards(cardsRef.current);
 
 return(
 
-<div className="bg-gradient-to-br from-[#f7f9fb] via-[#eef8f7] to-[#67e9de] pt-24 pb-16 px-4 sm:px-6 md:px-10 relative overflow-hidden -mt-16">
+<section
+  id="services"
+  className="bg-gradient-to-br from-[#f7f9fb] via-[#eef8f7] to-[#67e9de] pt-24 pb-16 px-4 sm:px-6 md:px-10 relative overflow-hidden -mt-16"
+>
 
 <img
 src={dnaImage}
@@ -93,7 +96,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam placerat pellent
 
 </div>
 
-</div>
+</section>
 
 )
 

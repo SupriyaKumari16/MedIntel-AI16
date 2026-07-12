@@ -42,7 +42,11 @@ const reportSchema = new mongoose.Schema(
   status:{
     type:String,
     default:"submitted"
-  }
+  },
+  aiAnalysis: {
+  type: Object,
+  default: {},
+}
 
 },
 

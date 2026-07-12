@@ -5,22 +5,29 @@ export const createReport = async (req,res)=>{
 try{
 
 const {
-symptoms,
-heartRate,
-bp,
-oxygen,
-reportFile
+  symptoms,
+  heartRate,
+  bp,
+  oxygen,
+  reportFile,
+  aiAnalysis,
 } = req.body;
 
 const report = await Report.create({
 
-patientId:req.user.id,
+  patientId: req.user.id,
 
-symptoms,
-heartRate,
-bp,
-oxygen,
-reportFile
+  symptoms,
+
+  heartRate,
+
+  bp,
+
+  oxygen,
+
+  reportFile,
+
+  aiAnalysis,
 
 });
 
@@ -33,13 +40,14 @@ report
 });
 
 }
-catch(error){
+catch (error) {
 
-console.log(error);
+  console.log("REPORT ERROR:");
+  console.log(error);
 
-res.status(500).json({
-message:"Server Error"
-});
+  res.status(500).json({
+    message: error.message
+  });
 
 }
 

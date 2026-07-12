@@ -2,9 +2,18 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Footer from "../../components/Footer";
+import { useSocket } from "../../videocall/providers/SocketProvider";
+import useCalling from "../../videocall/hooks/useCalling";
 
 export default function DoctorDashboard() {
   const navigate = useNavigate();
+  const socket = useSocket();
+
+  const {
+    callingPatient,
+    startCalling,
+    stopCalling,
+  } = useCalling();
 
   const loggedInUser = JSON.parse(
     localStorage.getItem("user")
@@ -12,6 +21,34 @@ export default function DoctorDashboard() {
 
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const handleCall = (patient) => {
+    if (!socket?.connected) {
+      alert("Socket not connected.");
+      return;
+    }
+
+    console.log("CALL BUTTON CLICKED");
+
+    startCalling(patient);
+console.log("Logged In User:", loggedInUser);
+console.log("Patient Object:", patient);
+   socket.emit("incoming-call", {
+  appointmentId: patient.appointmentId,
+  patientId: patient.patientId,
+  doctorId: loggedInUser.id,
+
+  doctorName: patient.doctorName,
+  doctorImage: "https://i.pravatar.cc/200?img=44",
+  specialization: "General Physician",
+
+  name: patient.name,
+  slot: patient.slot,
+  appointmentType: patient.appointmentType,
+});
+
+    console.log("Incoming Call Event Sent");
+  };
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -56,6 +93,7 @@ export default function DoctorDashboard() {
           bp: appointment.reportId?.bp || "N/A",
           oxygen: appointment.reportId?.oxygen || "N/A",
           risk: appointment.reportId?.riskLevel || "pending",
+          aiAnalysis: appointment.reportId?.aiAnalysis || {},
 
           img: "https://i.pravatar.cc/40?img=5",
         }));
@@ -75,6 +113,45 @@ export default function DoctorDashboard() {
 
     fetchAppointments();
   }, []);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleCallAccepted = () => {
+      console.log("Doctor got call-accepted");
+  alert("✅ Patient accepted the call.");
+
+  if (callingPatient) {
+    const patientData = callingPatient;
+
+    stopCalling();
+
+    navigate("/video-call", {
+      state: patientData,
+    });
+  }
+};
+
+    const handleCallRejected = () => {
+      alert("❌ Patient rejected the call.");
+      stopCalling();
+    };
+
+    const handlePatientOffline = () => {
+      alert("📴 Patient is offline.");
+      stopCalling();
+    };
+
+    socket.on("call-accepted", handleCallAccepted);
+    socket.on("call-rejected", handleCallRejected);
+    socket.on("patient-offline", handlePatientOffline);
+
+    return () => {
+      socket.off("call-accepted", handleCallAccepted);
+      socket.off("call-rejected", handleCallRejected);
+      socket.off("patient-offline", handlePatientOffline);
+    };
+  }, [socket, navigate, callingPatient, stopCalling]);
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
@@ -179,11 +256,7 @@ export default function DoctorDashboard() {
 
                     <td className="p-4 text-center">
                       <button
-                        onClick={() =>
-                          navigate("/video-call", {
-                            state: p,
-                          })
-                        }
+                        onClick={() => handleCall(p)}
                         className="bg-teal-500 text-white px-4 py-2 rounded"
                       >
                         Call

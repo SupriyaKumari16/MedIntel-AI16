@@ -8,13 +8,15 @@ import {
   FaDesktop,
 } from "react-icons/fa";
 import { useNavigate, useLocation } from "react-router-dom";
-import { io } from "socket.io-client";
+import { useSocket } from "../../videocall/providers/SocketProvider";
 
-const SOCKET_URL = "http://localhost:5000";
+// const SOCKET_URL = "http://localhost:5000";
 
 export default function VideoCallPage() {
+   console.log("VIDEO CALL PAGE RENDERED");
   const navigate = useNavigate();
   const location = useLocation();
+  const socket = useSocket();
 
   const patient =
     location.state ||
@@ -32,6 +34,10 @@ export default function VideoCallPage() {
   const [sharing, setSharing] = useState(false);
   const [callStatus, setCallStatus] = useState("Connecting...");
 
+  // New UI States
+  const [timer, setTimer] = useState(0);
+  const [remoteVideoLoaded, setRemoteVideoLoaded] = useState(false);
+
   const appointmentId =
     patient?.appointmentId ||
     patient?._id ||
@@ -39,6 +45,38 @@ export default function VideoCallPage() {
 
   const isDoctor =
     JSON.parse(localStorage.getItem("user"))?.role === "doctor";
+
+  // Extract display names dynamically for the professional header
+  const user = JSON.parse(localStorage.getItem("user"));
+  const counterpartName = isDoctor 
+    ? (patient?.name || "Patient") 
+    : (patient?.doctorName || "Doctor");
+
+  // Format call duration into MM:SS
+  const formatTime = (totalSeconds) => {
+    const mins = Math.floor(totalSeconds / 60);
+    const secs = totalSeconds % 60;
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  // Live call duration timer hook
+  useEffect(() => {
+    console.log("USE EFFECT STARTED");
+console.log("Appointment:", appointmentId);
+console.log("Patient:", patient);
+console.log("Socket:", socket);
+    let interval = null;
+    if (callStatus === "Connected") {
+      interval = setInterval(() => {
+        setTimer((prev) => prev + 1);
+      }, 1000);
+    } else if (callStatus !== "Connected" && callStatus !== "Reconnecting...") {
+      setTimer(0);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [callStatus]);
 
   const createPeerConnection = (stream) => {
     const peerConnection = new RTCPeerConnection({
@@ -62,24 +100,47 @@ export default function VideoCallPage() {
       }
     };
 
-    peerConnection.ontrack = (event) => {
-      if (mainVideoRef.current) {
-        mainVideoRef.current.srcObject = event.streams[0];
-      }
+   peerConnection.ontrack = (event) => {
+  console.log("🎥 ONTRACK FIRED");
+  console.log(event.streams);
 
-      setCallStatus("In Call");
+  if (mainVideoRef.current) {
+    mainVideoRef.current.srcObject = event.streams[0];
+
+    mainVideoRef.current.onloadedmetadata = () => {
+      mainVideoRef.current.play();
+      setRemoteVideoLoaded(true);
     };
+  }
+
+  setCallStatus("Connected");
+};
 
     peerConnection.onconnectionstatechange = () => {
+      console.log(
+        "Connection:",
+        peerConnection.connectionState
+      );
+
       if (peerConnection.connectionState === "connected") {
-        setCallStatus("In Call");
+        setCallStatus("Connected");
+      }
+
+      if (peerConnection.connectionState === "connecting") {
+        setCallStatus("Connecting...");
+      }
+
+      if (peerConnection.connectionState === "disconnected") {
+        setCallStatus("Reconnecting...");
+        setRemoteVideoLoaded(false);
       }
 
       if (
-        peerConnection.connectionState === "disconnected" ||
-        peerConnection.connectionState === "failed"
+        peerConnection.connectionState === "failed" ||
+        peerConnection.connectionState === "closed"
       ) {
-        setCallStatus("Connection lost");
+        setCallStatus("Call Ended");
+        setRemoteVideoLoaded(false);
       }
     };
 
@@ -98,16 +159,28 @@ export default function VideoCallPage() {
     let active = true;
 
     const startCall = async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: true,
-          audio: true,
-        });
+  console.log("START CALL");
 
-        if (!active) {
-          stream.getTracks().forEach((track) => track.stop());
-          return;
-        }
+  try {
+    console.log("Before getUserMedia");
+
+    // const stream = await navigator.mediaDevices.getUserMedia({
+    //   video: true,
+    //   audio: true,
+    // });
+    const stream = await navigator.mediaDevices.getUserMedia({
+  video: true,
+  audio: true,
+});
+
+    console.log("After getUserMedia");
+
+    if (!active) {
+      stream.getTracks().forEach((track) => track.stop());
+      return;
+    }
+
+    
 
         localStreamRef.current = stream;
 
@@ -115,23 +188,25 @@ export default function VideoCallPage() {
           smallVideoRef.current.srcObject = stream;
         }
 
-        const socket = io(SOCKET_URL, {
-          transports: ["websocket"],
-        });
-
         socketRef.current = socket;
 
-        socket.on("connect", () => {
-          socket.emit("join-call-room", appointmentId);
-          setCallStatus("Waiting for the other person...");
-        });
+        // FIXED: Execute room entry immediately if connection is already established
+        if (socketRef.current.connected) {
+          socketRef.current.emit("join-call-room", appointmentId);
+          setCallStatus("Waiting for participant...");
+        } else {
+          socketRef.current.on("connect", () => {
+            socketRef.current.emit("join-call-room", appointmentId);
+            setCallStatus("Waiting for participant...");
+          });
+        }
 
-        socket.on("call-room-full", () => {
+        socketRef.current.on("call-room-full", () => {
           alert("This call already has two people.");
           navigate(isDoctor ? "/doctor-dashboard" : "/");
         });
 
-        socket.on("call-user-joined", async () => {
+        socketRef.current.on("call-user-joined", async () => {
           if (!isDoctor) return;
 
           try {
@@ -141,32 +216,34 @@ export default function VideoCallPage() {
 
             await peerConnection.setLocalDescription(offer);
 
-            socket.emit("webrtc-offer", {
+            socketRef.current.emit("webrtc-offer", {
               appointmentId,
               offer,
             });
 
-            setCallStatus("Calling patient...");
+            setCallStatus("Connecting...");
           } catch (error) {
             console.log("OFFER ERROR:", error);
           }
         });
 
-        socket.on("webrtc-offer", async (offer) => {
+        // FIXED: Unwraps payloads safely if encapsulated by object containers
+        socketRef.current.on("webrtc-offer", async (data) => {
           if (isDoctor) return;
 
           try {
             const peerConnection = createPeerConnection(stream);
+            const rawOffer = data.offer || data;
 
             await peerConnection.setRemoteDescription(
-              new RTCSessionDescription(offer)
+              new RTCSessionDescription(rawOffer)
             );
 
             const answer = await peerConnection.createAnswer();
 
             await peerConnection.setLocalDescription(answer);
 
-            socket.emit("webrtc-answer", {
+            socketRef.current.emit("webrtc-answer", {
               appointmentId,
               answer,
             });
@@ -175,32 +252,37 @@ export default function VideoCallPage() {
           }
         });
 
-        socket.on("webrtc-answer", async (answer) => {
+        // FIXED: Unwraps payload properties cleanly
+        socketRef.current.on("webrtc-answer", async (data) => {
           try {
             if (!peerConnectionRef.current) return;
+            const rawAnswer = data.answer || data;
 
             await peerConnectionRef.current.setRemoteDescription(
-              new RTCSessionDescription(answer)
+              new RTCSessionDescription(rawAnswer)
             );
           } catch (error) {
             console.log("SET ANSWER ERROR:", error);
           }
         });
 
-        socket.on("webrtc-ice-candidate", async (candidate) => {
+        // FIXED: Unwraps incoming candidate structural parameters properly
+        socketRef.current.on("webrtc-ice-candidate", async (data) => {
           try {
             if (!peerConnectionRef.current) return;
+            const rawCandidate = data.candidate || data;
 
             await peerConnectionRef.current.addIceCandidate(
-              new RTCIceCandidate(candidate)
+              new RTCIceCandidate(rawCandidate)
             );
           } catch (error) {
             console.log("ICE CANDIDATE ERROR:", error);
           }
         });
 
-        socket.on("call-user-left", () => {
-          setCallStatus("Other person left the call");
+        socketRef.current.on("call-user-left", () => {
+          setCallStatus("Waiting for participant...");
+          setRemoteVideoLoaded(false);
 
           if (mainVideoRef.current) {
             mainVideoRef.current.srcObject = null;
@@ -209,24 +291,57 @@ export default function VideoCallPage() {
           peerConnectionRef.current?.close();
           peerConnectionRef.current = null;
         });
-      } catch (error) {
-        console.log("CAMERA ERROR:", error);
-        alert("Camera and microphone permission is required for the call.");
-        navigate(isDoctor ? "/doctor-dashboard" : "/");
-      }
+
+        socketRef.current.on("call-ended", () => {
+          alert("Call Ended");
+          setCallStatus("Call Ended");
+          setRemoteVideoLoaded(false);
+
+          peerConnectionRef.current?.close();
+          peerConnectionRef.current = null;
+
+          localStreamRef.current?.getTracks().forEach((track) => {
+            track.stop();
+          });
+
+          navigate(isDoctor ? "/doctor-dashboard" : "/");
+        });
+      } catch (err) {
+  console.error("getUserMedia error:", err);
+  console.error("name:", err.name);
+  console.error("message:", err.message);
+
+  alert(err.name + "\n" + err.message);
+}
     };
 
     startCall();
 
     return () => {
+      console.log("VIDEO CALL CLEANUP RUNNING");
+      console.log("Leaving room:", appointmentId);
       active = false;
 
-      if (appointmentId) {
-        socketRef.current?.emit("leave-call-room", appointmentId);
-      }
+      // if (appointmentId) {
+      //   socketRef.current?.emit("call-ended", {
+      //     appointmentId,
+      //     doctorId: patient?.doctorId,
+      //     patientId: patient?.patientId,
+      //   });
 
-      socketRef.current?.disconnect();
+      //   socketRef.current?.emit("leave-call-room", appointmentId);
+      // }
 
+      socketRef.current?.off("call-user-left");
+      socketRef.current?.off("call-ended");
+      socketRef.current?.off("webrtc-offer");
+      socketRef.current?.off("webrtc-answer");
+      socketRef.current?.off("webrtc-ice-candidate");
+     socketRef.current?.off("call-room-full");
+socketRef.current?.off("call-user-joined");
+
+      // NOTE: Intentionally removed .disconnect() here because you use a shared SocketProvider.
+      // Disconnecting here drops the context socket instance entirely across the system.
       peerConnectionRef.current?.close();
 
       localStreamRef.current?.getTracks().forEach((track) => {
@@ -254,6 +369,13 @@ export default function VideoCallPage() {
   const handleShare = async () => {
     try {
       if (sharing) {
+        if (mainVideoRef.current && peerConnectionRef.current) {
+          const receivers = peerConnectionRef.current.getReceivers();
+          const remoteVideoTrack = receivers.find(r => r.track && r.track.kind === "video")?.track;
+          if (remoteVideoTrack) {
+            mainVideoRef.current.srcObject = new MediaStream([remoteVideoTrack]);
+          }
+        }
         setSharing(false);
         return;
       }
@@ -269,6 +391,15 @@ export default function VideoCallPage() {
       setSharing(true);
 
       displayStream.getVideoTracks()[0].onended = () => {
+        if (mainVideoRef.current && peerConnectionRef.current) {
+          const receivers = peerConnectionRef.current.getReceivers();
+          const remoteVideoTrack = receivers.find(r => r.track && r.track.kind === "video")?.track;
+          if (remoteVideoTrack) {
+            mainVideoRef.current.srcObject = new MediaStream([remoteVideoTrack]);
+          } else {
+            mainVideoRef.current.srcObject = null;
+          }
+        }
         setSharing(false);
       };
     } catch (error) {
@@ -277,9 +408,15 @@ export default function VideoCallPage() {
   };
 
   const endCall = () => {
+    setCallStatus("Call Ended");
+    setRemoteVideoLoaded(false);
+    
+    socketRef.current?.emit("call-ended", {
+      appointmentId,
+      doctorId: patient?.doctorId,
+      patientId: patient?.patientId,
+    });
     socketRef.current?.emit("leave-call-room", appointmentId);
-
-    socketRef.current?.disconnect();
 
     peerConnectionRef.current?.close();
 
@@ -297,25 +434,64 @@ export default function VideoCallPage() {
   };
 
   return (
-    <div className="h-screen w-full bg-black relative text-white overflow-hidden">
-      <div className="absolute top-0 w-full px-4 py-3 z-10 bg-gradient-to-b from-black/80 to-transparent">
-        <h2 className="text-lg font-semibold">
-          {patient?.name || "Video Consultation"}
-        </h2>
+    <div className="h-screen w-full bg-slate-950 relative text-white overflow-hidden font-sans">
+      
+      {/* Professional Top Glassmorphic Header */}
+      <div className="absolute top-0 w-full px-6 py-4 z-20 bg-gradient-to-b from-black/90 via-black/50 to-transparent flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-white/5 backdrop-blur-xs">
+        <div>
+          <h2 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            {counterpartName}
+          </h2>
+          <p className="text-xs font-medium text-slate-400 mt-0.5">
+            Role: {isDoctor ? "Consulting Doctor" : "Patient File View"}
+          </p>
+        </div>
 
-        <p className="text-xs text-gray-300">
-          {callStatus}
-        </p>
+        <div className="flex items-center gap-4 sm:self-center">
+          {/* Status Badge */}
+          <div className={`px-3 py-1 rounded-full text-xs font-semibold tracking-wide shadow-sm flex items-center gap-1.5 backdrop-blur-md border ${
+            callStatus === "Connected" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" :
+            callStatus === "Reconnecting..." ? "bg-amber-500/10 text-amber-400 border-amber-500/20 animate-pulse" :
+            callStatus === "Waiting for participant..." ? "bg-sky-500/10 text-sky-400 border-sky-500/20" :
+            "bg-slate-500/10 text-slate-400 border-slate-500/20"
+          }`}>
+            {callStatus === "Connected" && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>}
+            {callStatus}
+          </div>
+
+          {/* Call Duration Counter */}
+          <div className="bg-slate-800/60 px-3 py-1 rounded-md border border-slate-700/50 text-sm font-mono font-medium text-slate-200 shadow-inner">
+            {formatTime(timer)}
+          </div>
+        </div>
       </div>
 
-      <video
-        ref={mainVideoRef}
-        autoPlay
-        playsInline
-        className="w-full h-full object-cover bg-gray-950"
-      />
+      {/* Main Stream Frame Container */}
+      <div className="relative w-full h-full flex items-center justify-center bg-slate-900">
+        <video
+          ref={mainVideoRef}
+          autoPlay
+          playsInline
+          onLoadedData={() => setRemoteVideoLoaded(true)}
+          className={`w-full h-full object-cover transition-opacity duration-500 ${
+            remoteVideoLoaded ? "opacity-100" : "opacity-0"
+          }`}
+        />
 
-      <div className="absolute top-20 right-4 w-28 h-36 rounded-xl overflow-hidden border border-white/30 bg-gray-800 shadow-xl">
+        {/* CSS Loading Spinner State */}
+        {!remoteVideoLoaded && callStatus !== "Call Ended" && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/90 z-10 gap-3">
+            <div className="w-12 h-12 border-4 border-slate-700 border-t-emerald-500 rounded-full animate-spin"></div>
+            <p className="text-sm font-medium text-slate-400 tracking-wide">
+              {callStatus === "Waiting for participant..." ? "Waiting for response..." : "Connecting to video..."}
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Mini-Self Preview Picture-in-Picture Card */}
+      <div className="absolute top-24 right-4 w-32 h-44 sm:w-40 sm:h-52 rounded-2xl overflow-hidden border-2 border-white/10 bg-slate-950 shadow-2xl transition-all duration-300 hover:scale-105 z-10">
         <video
           ref={smallVideoRef}
           autoPlay
@@ -323,41 +499,68 @@ export default function VideoCallPage() {
           playsInline
           className="w-full h-full object-cover scale-x-[-1]"
         />
+        <div className="absolute bottom-2 left-2 bg-black/60 backdrop-blur-md px-1.5 py-0.5 rounded text-[10px] text-slate-300 font-medium">
+          You
+        </div>
       </div>
 
-      <div className="absolute bottom-6 w-full px-4 flex justify-center gap-3 sm:gap-5">
-        <button
-          onClick={toggleMic}
-          className="p-4 rounded-full bg-gray-700 hover:bg-gray-600 transition"
-        >
-          {micOn ? <FaMicrophone /> : <FaMicrophoneSlash />}
-        </button>
+      {/* Premium Studio Bottom Controls Panel */}
+      <div className="absolute bottom-8 w-full px-4 flex justify-center z-20">
+        <div className="flex items-center gap-4 bg-slate-900/80 backdrop-blur-xl px-6 py-3.5 rounded-full border border-white/10 shadow-2xl">
+          
+          {/* Audio Button */}
+          <button
+            onClick={toggleMic}
+            className={`p-4 rounded-full transition-all duration-200 cursor-pointer shadow-md ${
+              micOn 
+                ? "bg-slate-800 hover:bg-slate-700 text-white" 
+                : "bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30"
+            }`}
+            title={micOn ? "Mute Microphone" : "Unmute Microphone"}
+          >
+            {micOn ? <FaMicrophone className="text-lg" /> : <FaMicrophoneSlash className="text-lg" />}
+          </button>
 
-        <button
-          onClick={toggleCam}
-          className="p-4 rounded-full bg-gray-700 hover:bg-gray-600 transition"
-        >
-          {camOn ? <FaVideo /> : <FaVideoSlash />}
-        </button>
+          {/* Camera Button */}
+          <button
+            onClick={toggleCam}
+            className={`p-4 rounded-full transition-all duration-200 cursor-pointer shadow-md ${
+              camOn 
+                ? "bg-slate-800 hover:bg-slate-700 text-white" 
+                : "bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30"
+            }`}
+            title={camOn ? "Stop Video" : "Start Video"}
+          >
+            {camOn ? <FaVideo className="text-lg" /> : <FaVideoSlash className="text-lg" />}
+          </button>
 
-        <button
-          onClick={handleShare}
-          className={`p-4 rounded-full transition ${
-            sharing
-              ? "bg-teal-500"
-              : "bg-gray-700 hover:bg-gray-600"
-          }`}
-        >
-          <FaDesktop />
-        </button>
+          {/* Screen Share Button */}
+          <button
+            onClick={handleShare}
+            className={`p-4 rounded-full transition-all duration-200 cursor-pointer shadow-md ${
+              sharing
+                ? "bg-emerald-500 hover:bg-emerald-600 text-white animate-pulse"
+                : "bg-slate-800 hover:bg-slate-700 text-white"
+            }`}
+            title={sharing ? "Stop Sharing Screen" : "Share Screen"}
+          >
+            <FaDesktop className="text-lg" />
+          </button>
 
-        <button
-          onClick={endCall}
-          className="p-4 rounded-full bg-red-600 hover:bg-red-700 transition"
-        >
-          <FaPhone className="transform rotate-[230deg]" />
-        </button>
+          <div className="w-px h-6 bg-slate-800 mx-1"></div>
+
+          {/* End Call Button */}
+          <button
+            onClick={endCall}
+            className="p-4 rounded-full bg-red-600 hover:bg-red-500 text-white transition-all duration-200 cursor-pointer shadow-lg hover:shadow-red-600/20 hover:scale-105 active:scale-95"
+            title="Disconnect Call"
+          >
+            <FaPhone className="text-lg transform rotate-[230deg]" />
+          </button>
+
+        </div>
       </div>
+
     </div>
   );
 }

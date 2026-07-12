@@ -7,13 +7,11 @@ export default function DoctorFinalReport(){
 const location=useLocation();
 const navigate=useNavigate();
 
-const report=
-location.state||
-JSON.parse(
-localStorage.getItem(
-"latestReport"
-)
-);
+const report =
+location.state ||
+JSON.parse(localStorage.getItem("latestReport"));
+
+const ai = report?.aiAnalysis || {};
 
 useEffect(()=>{
 
@@ -21,8 +19,11 @@ if(!report)
 return;
 
 localStorage.setItem(
-"latestReport",
-JSON.stringify(report)
+  "latestReport",
+  JSON.stringify({
+    ...report,
+    aiAnalysis: ai,
+  })
 );
 
 const old=
@@ -51,8 +52,9 @@ const updated=[
 ...old,
 
 {
-...report,
-date:new Date().toLocaleDateString()
+  ...report,
+  aiAnalysis: ai,
+  date: new Date().toLocaleDateString(),
 }
 
 ];
@@ -88,17 +90,22 @@ No Report Found
 const {
 name,
 symptoms,
-risk,
-diagnosis,
-prescription,
-recommendation,
-followUp,
-notes,
 heartRate,
 bp,
 oxygen
+} = report;
 
-}=report;
+const risk = ai?.riskLevel || "LOW";
+
+const diagnosis = ai?.diagnosis || "N/A";
+
+const recommendation = ai?.recommendation || "N/A";
+
+const prescription = ai?.prescription || "N/A";
+
+const followUp = ai?.followUp || "N/A";
+
+const notes = ai?.doctorNotes || "N/A";
 
 
 

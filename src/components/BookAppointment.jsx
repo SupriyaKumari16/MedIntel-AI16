@@ -59,14 +59,42 @@ export default function BookAppointment() {
         return;
       }
 
+      const aiResponse = await fetch(
+  "http://localhost:5000/api/ai/analyze-initial",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      name,
+      age,
+      symptoms,
+    }),
+  }
+);
+
+const aiData = await aiResponse.json();
+
+if (!aiResponse.ok) {
+  alert("AI Analysis Failed");
+  return;
+}
+
       alert("Appointment Submitted Successfully");
 
       navigate("/processing", {
-        state: {
-          type: "initial",
-          symptoms
-        }
-      });
+  state: {
+    type: "initial",
+
+    name,
+    age,
+    symptoms,
+
+    aiAnalysis: aiData.analysis,
+  },
+});
 
     }
     catch (error) {

@@ -3,7 +3,7 @@ import { GoogleGenAI } from "@google/genai";
 
 export const chatWithBot = async (req, res) => {
   try {
-
+console.log("Gemini Key Length:", process.env.GEMINI_API_KEY?.length);
     const ai = new GoogleGenAI({
       apiKey: process.env.GEMINI_API_KEY,
     });

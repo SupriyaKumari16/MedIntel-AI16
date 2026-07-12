@@ -1,10 +1,11 @@
-import React, { useEffect } from "react";
+import React, { useEffect, lazy, Suspense } from "react";
 
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   useLocation,
+  Navigate,
 } from "react-router-dom";
 
 import {
@@ -20,14 +21,21 @@ import About from "./components/About";
 import Stats from "./components/Stats";
 import Services from "./components/Services";
 import Facilities from "./components/Facilities";
-import DoctorSection from "./components/DoctorSection";
-import Testimonial from "./components/Testimonial";
+const DoctorSection = lazy(() => import("./components/DoctorSection"));
+const Testimonial = lazy(() => import("./components/Testimonial"));
 import Support from "./components/Support";
 import Newsletter from "./components/Newsletter";
 import Footer from "./components/Footer";
 import BookAppointment from "./components/BookAppointment";
 import ChatBot from "./chatbot/ChatBot";
-
+import { SocketProvider } from "./videocall/providers/SocketProvider";
+import { IncomingCallProvider } from "./videocall/providers/IncomingCallProvider";
+import IncomingCallModal from "./videocall/components/IncomingCallModal";
+import { CallingProvider } from "./videocall/providers/CallingProvider";
+import CallingModal from "./videocall/components/CallingModal";
+import ProtectedDoctorRoute from "./routes/ProtectedDoctorRoute";
+import ProtectedPatientRoute from "./routes/ProtectedPatientRoute";
+import ProtectedAuthRoute from "./routes/ProtectedAuthRoute";
 /* PAGES */
 
 import Auth from "./pages/Auth";
@@ -55,6 +63,23 @@ function Layout() {
 
   const location =
     useLocation();
+    const user = JSON.parse(localStorage.getItem("user"));
+
+if (location.pathname === "/" && user?.role === "doctor") {
+  return <Navigate to="/doctor-dashboard" replace />;
+}
+
+    useEffect(() => {
+
+  initLenis();
+
+  return () => {
+
+    destroyLenis();
+
+  };
+
+}, []);
 
 
   const hideNavbar =
@@ -115,9 +140,17 @@ function Layout() {
 
               <Facilities />
 
-              <DoctorSection />
+             <Suspense fallback={<div className="h-[500px]" />}>
 
-              <Testimonial />
+  <DoctorSection />
+
+</Suspense>
+
+<Suspense fallback={<div className="h-[500px]" />}>
+
+  <Testimonial />
+
+</Suspense>
 
               <Support />
 
@@ -148,34 +181,26 @@ function Layout() {
 
         {/* APPOINTMENT */}
 
-        <Route
-
-          path="/appointment"
-
-          element={
-
-            <BookAppointment />
-
-          }
-
-        />
+       <Route
+  path="/appointment"
+  element={
+    <ProtectedPatientRoute>
+      <BookAppointment />
+    </ProtectedPatientRoute>
+  }
+/>
 
 
 
 
-        {/* PROCESS */}
-
-        <Route
-
-          path="/processing"
-
-          element={
-
-            <ProcessingPage />
-
-          }
-
-        />
+       <Route
+  path="/processing"
+  element={
+    <ProtectedPatientRoute>
+      <ProcessingPage />
+    </ProtectedPatientRoute>
+  }
+/>
 
 
 
@@ -183,38 +208,49 @@ function Layout() {
         {/* REPORT */}
 
         <Route
-
-          path="/report"
-
-          element={<ReportPage />}
-
-        />
-
-
-        <Route
-
-          path="/upload-report"
-
-          element={<UploadReport />}
-
-        />
+  path="/report"
+  element={
+    <ProtectedAuthRoute>
+      <ReportPage />
+    </ProtectedAuthRoute>
+  }
+/>
 
 
-        <Route
+       <Route
+  path="/upload-report"
+  element={
+    <ProtectedPatientRoute>
+      <UploadReport />
+    </ProtectedPatientRoute>
+  }
+/>
 
-          path="/prescription"
 
-          element={
-
-            <PrescriptionPage />
-
-          }
-
-        />
-
+       <Route
+  path="/prescription"
+  element={
+    <ProtectedAuthRoute>
+      <PrescriptionPage />
+    </ProtectedAuthRoute>
+  }
+/>
         <Route
   path="/my-appointments"
-  element={<PatientAppointments />}
+  element={
+    <ProtectedPatientRoute>
+      <PatientAppointments />
+    </ProtectedPatientRoute>
+  }
+/>
+
+        <Route
+  path="/patient-case"
+  element={
+    <ProtectedDoctorRoute>
+      <PatientCasePage />
+    </ProtectedDoctorRoute>
+  }
 />
 
 
@@ -223,89 +259,66 @@ function Layout() {
         {/* DOCTOR */}
 
         <Route
-
-          path="/doctor-dashboard"
-
-          element={
-
-            <DoctorDashboard />
-
-          }
-
-        />
+  path="/doctor-dashboard"
+  element={
+    <ProtectedDoctorRoute>
+      <DoctorDashboard />
+    </ProtectedDoctorRoute>
+  }
+/>
 
 
-        <Route
-
-          path="/doctor/:id"
-
-          element={
-
-            <DoctorDetailPage />
-
-          }
-
-        />
+       <Route
+  path="/doctor/:id"
+  element={
+    <ProtectedPatientRoute>
+      <DoctorDetailPage />
+    </ProtectedPatientRoute>
+  }
+/>
 
 
-        <Route
-
-          path="/video-call"
-
-          element={
-
-            <VideoCallPage />
-
-          }
-
-        />
+       <Route
+  path="/video-call"
+  element={
+    <ProtectedDoctorRoute>
+      <VideoCallPage />
+    </ProtectedDoctorRoute>
+  }
+/>
 
 
-        <Route
-
-          path="/doctor-decision"
-
-          element={
-
-            <DoctorDecisionPage />
-
-          }
-
-        />
+      <Route
+  path="/doctor-decision"
+  element={
+    <ProtectedDoctorRoute>
+      <DoctorDecisionPage />
+    </ProtectedDoctorRoute>
+  }
+/>
 
 
         <Route
-
-          path="/doctor-final-report"
-
-          element={
-
-            <DoctorFinalReport />
-
-          }
-
-        />
+  path="/doctor-final-report"
+  element={
+    <ProtectedDoctorRoute>
+      <DoctorFinalReport />
+    </ProtectedDoctorRoute>
+  }
+/>
 
 
 
 
         {/* CASE */}
 
-        <Route
-
-          path="/patient-case"
-
-          element={
-
-            <PatientCasePage />
-
-          }
-
-        />
+       
 
 
       </Routes>
       <ChatBot />
+      <IncomingCallModal />
+      <CallingModal />
 
 
     </>
@@ -337,11 +350,15 @@ export default function App() {
 
   return (
 
-    <Router>
-
-      <Layout />
-
-    </Router>
+<Router>
+  <SocketProvider>
+    <CallingProvider>
+      <IncomingCallProvider>
+        <Layout />
+      </IncomingCallProvider>
+    </CallingProvider>
+  </SocketProvider>
+</Router>
 
   );
 

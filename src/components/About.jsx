@@ -82,7 +82,7 @@ return()=>ctx.revert();
 
 return(
 
-<section className="relative overflow-hidden bg-gradient-to-br from-cyan-50 via-teal-50 to-blue-50">
+<section id="about" className="relative overflow-hidden bg-gradient-to-br from-cyan-50 via-teal-50 to-blue-50">
 
 <div className="absolute inset-0 overflow-hidden pointer-events-none">
 

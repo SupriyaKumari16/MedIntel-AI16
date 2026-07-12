@@ -18,7 +18,7 @@ const data=[
 
 useEffect(()=>{
 
-textReveal(headingRef.current);
+// textReveal(headingRef.current);
 
 },[]);
 
