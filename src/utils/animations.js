@@ -4,6 +4,13 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 gsap.registerPlugin(ScrollTrigger);
 
 ScrollTrigger.config({autoRefreshEvents:"load,DOMContentLoaded"});
+gsap.defaults({
+  overwrite: "auto",
+});
+ScrollTrigger.defaults({
+  fastScrollEnd: true,
+  invalidateOnRefresh: true,
+});
 
 export const fadeUp=(el)=>{
 
@@ -16,8 +23,8 @@ el,
 {
 opacity:0,
 y:isMobile?40:80,
-willChange:"transform,opacity",
-force3D:true
+willChange: "transform, opacity",
+force3D: true,
 },
 {
 opacity:1,
@@ -27,9 +34,8 @@ ease:"power3.out",
 clearProps:"willChange",
 scrollTrigger:{
 trigger:el,
-start:"top 92%",
-toggleActions:"play none none none",
-once:true
+start:"top bottom-=100",
+once:true,
 }
 }
 );
@@ -50,8 +56,8 @@ cards,
 opacity:0,
 y:isMobile?20:30,
 scale:.98,
-willChange:"transform,opacity",
-force3D:true
+willChange: "transform, opacity",
+force3D: true,
 },
 {
 opacity:1,
@@ -63,8 +69,8 @@ ease:"power2.out",
 clearProps:"willChange",
 scrollTrigger:{
 trigger:cards[0],
-start:isMobile?"top 100%":"top 99%",
-once:true
+start:"top bottom-=50",
+once:true,
 }
 }
 );
@@ -169,8 +175,8 @@ el,
 {
 opacity:0,
 y:isMobile?40:120,
-willChange:"transform,opacity",
-force3D:true
+willChange: "transform, opacity",
+force3D: true,
 },
 {
 opacity:1,
@@ -180,8 +186,8 @@ ease:"power2.out",
 clearProps:"willChange",
 scrollTrigger:{
 trigger:el,
-start:isMobile?"top 95%":"top 92%",
-once:true
+start:"top bottom-=100",
+once:true,
 }
 }
 );
@@ -199,6 +205,7 @@ card.addEventListener("mouseenter",()=>{
 gsap.to(
 card,
 {
+  overwrite: true,
 y:-10,
 scale:1.03,
 duration:.35,
@@ -215,6 +222,7 @@ card.addEventListener("mouseleave",()=>{
 gsap.to(
 card,
 {
+  overwrite: true,
 y:0,
 scale:1,
 duration:.35,

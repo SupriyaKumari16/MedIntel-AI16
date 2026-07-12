@@ -38,7 +38,8 @@ opacity:1,
 y:0,
 duration:.9,
 stagger:.25,
-ease:"power4.out"
+ease:"power4.out",
+clearProps:"willChange"
 }
 )
 
@@ -73,17 +74,20 @@ duration:.6
 
 
 gsap.fromTo(
-imgRef.current,
-{
-opacity:0,
-x:120
-},
-{
-opacity:1,
-x:40,
-duration:1.4,
-ease:"power4.out"
-}
+  imgRef.current,
+  {
+    opacity: 0,
+    x: 120,
+    force3D: true,
+    willChange: "transform,opacity",
+  },
+  {
+    opacity: 1,
+    x: 40,
+    duration: 1.4,
+    ease: "power4.out",
+    clearProps: "willChange",
+  }
 );
 
 },[]);

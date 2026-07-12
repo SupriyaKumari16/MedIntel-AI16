@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, memo } from "react";
 import { Menu, X } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 
-export default function Navbar() {
+ function Navbar() {
   const [active, setActive] = useState("Home");
   const [open, setOpen] = useState(false);
 
@@ -175,3 +175,4 @@ export default function Navbar() {
     </div>
   );
 }
+export default memo(Navbar);

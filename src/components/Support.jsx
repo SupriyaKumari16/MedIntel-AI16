@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, memo } from "react";
 import { FiSend, FiMail, FiUser } from "react-icons/fi";
 import { useForm } from "@formspree/react";
 
@@ -160,4 +160,4 @@ const [showSuccess, setShowSuccess] = useState(false);
   );
 };
 
-export default Support;
+export default memo(Support);

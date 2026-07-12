@@ -6,7 +6,7 @@ import {Stethoscope,Sparkles} from "lucide-react";
 import HeroDoctor from "../assets/HeroDoctor.png";
 import {textReveal,fadeUp} from "../utils/animations";
 
-gsap.registerPlugin(ScrollTrigger);
+// gsap.registerPlugin(ScrollTrigger);
 
 export default function About(){
 
@@ -45,9 +45,11 @@ if(desktopImgRef.current){
 gsap.fromTo(
 desktopImgRef.current,
 {
-opacity:0,
-x:120,
-scale:.95
+  opacity:0,
+  x:120,
+  scale:.95,
+  force3D:true,
+  willChange:"transform,opacity"
 },
 {
 opacity:1,
@@ -55,6 +57,7 @@ x:0,
 scale:1,
 duration:1.6,
 ease:"expo.out",
+clearProps:"willChange",
 scrollTrigger:{
 trigger:desktopImgRef.current,
 start:"top 88%",

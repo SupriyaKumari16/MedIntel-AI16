@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Newsletter = () => {
@@ -72,4 +72,4 @@ const Newsletter = () => {
   );
 };
 
-export default Newsletter;
+export default memo(Newsletter);

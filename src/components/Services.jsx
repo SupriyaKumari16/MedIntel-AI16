@@ -1,16 +1,18 @@
-import React,{useEffect,useRef} from "react";
+import React,{useEffect,useRef,} from "react";
 import {FaHeart,FaBrain,FaTooth,FaLungs,FaXRay,FaUserMd} from "react-icons/fa";
 import dnaImage from "../assets/dna.png";
 import {textReveal,staggerCards} from "../utils/animations";
+import { gsap } from "gsap";
 
-const services=[
+const services = [
 {icon:<FaHeart/>,title:"Cardiology"},
 {icon:<FaBrain/>,title:"Neurology"},
 {icon:<FaTooth/>,title:"Urology"},
 {icon:<FaLungs/>,title:"Pulmonary"},
 {icon:<FaXRay/>,title:"Radiology"},
 {icon:<FaUserMd/>,title:"Hypnotherapy"},
-];
+]
+
 
 export default function Services(){
 
@@ -18,13 +20,19 @@ const headingRef=useRef(null);
 const textRef=useRef(null);
 const cardsRef=useRef([]);
 
-useEffect(()=>{
+useEffect(() => {
 
-textReveal(headingRef.current);
-textReveal(textRef.current);
-staggerCards(cardsRef.current);
+  const ctx = gsap.context(() => {
 
-},[]);
+    textReveal(headingRef.current);
+    textReveal(textRef.current);
+    staggerCards(cardsRef.current);
+
+  });
+
+  return () => ctx.revert();
+
+}, []);
 
 return(
 

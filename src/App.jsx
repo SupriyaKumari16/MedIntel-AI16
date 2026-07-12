@@ -1,4 +1,8 @@
-import React, { useEffect, lazy, Suspense } from "react";
+import React, {
+  useEffect,
+  lazy,
+  Suspense,
+} from "react";
 
 import {
   BrowserRouter as Router,
@@ -12,6 +16,8 @@ import {
   initLenis,
   destroyLenis,
 } from "./utils/lenis";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useInView } from "react-intersection-observer";
 
 /* COMPONENTS */
 
@@ -20,12 +26,14 @@ import Home from "./components/Home";
 import About from "./components/About";
 import Stats from "./components/Stats";
 import Services from "./components/Services";
-import Facilities from "./components/Facilities";
+const Facilities = lazy(() =>import("./components/Facilities"));
 const DoctorSection = lazy(() => import("./components/DoctorSection"));
 const Testimonial = lazy(() => import("./components/Testimonial"));
-import Support from "./components/Support";
-import Newsletter from "./components/Newsletter";
-import Footer from "./components/Footer";
+const Support = lazy(() =>import("./components/Support"));
+const Newsletter = lazy(() =>import("./components/Newsletter"));
+const Footer = lazy(() =>import("./components/Footer"));
+
+
 import BookAppointment from "./components/BookAppointment";
 import ChatBot from "./chatbot/ChatBot";
 import { SocketProvider } from "./videocall/providers/SocketProvider";
@@ -61,25 +69,51 @@ import DoctorDetailPage from "./Doctor/Doctorpage/DoctorDetailPage";
 
 function Layout() {
 
-  const location =
-    useLocation();
-    const user = JSON.parse(localStorage.getItem("user"));
+  const location = useLocation();
+  const user = JSON.parse(localStorage.getItem("user"));
 
-if (location.pathname === "/" && user?.role === "doctor") {
-  return <Navigate to="/doctor-dashboard" replace />;
-}
+  const { ref: preloadRef, inView } = useInView({
+    triggerOnce: true,
+    rootMargin: "600px",
+  });
 
-    useEffect(() => {
+  if (location.pathname === "/" && user?.role === "doctor") {
+    return <Navigate to="/doctor-dashboard" replace />;
+  }
 
-  initLenis();
+  useEffect(() => {
+    initLenis();
 
-  return () => {
+    return () => {
+      destroyLenis();
+    };
+  }, []);
 
-    destroyLenis();
+  useEffect(() => {
+    if (inView) {
+      import("./components/DoctorSection");
+      import("./components/Testimonial");
+      import("./components/Facilities");
+      import("./components/Support");
+      import("./components/Newsletter");
+      import("./components/Footer");
+    }
+  }, [inView]);
 
-  };
+  useEffect(() => {
+    const refresh = () => {
+      requestAnimationFrame(() => {
+        ScrollTrigger.refresh();
+      });
+    };
 
-}, []);
+    window.addEventListener("load", refresh);
+
+    return () => {
+      window.removeEventListener("load", refresh);
+    };
+  }, []);
+
 
 
   const hideNavbar =
@@ -123,46 +157,43 @@ if (location.pathname === "/" && user?.role === "doctor") {
         {/* HOME */}
 
         <Route
+  path="/"
+  element={
+    <>
+      <Home />
+      <About />
+      <Stats />
+      <Services />
 
-          path="/"
+      {/* Prefetch Trigger */}
+      <div ref={preloadRef} className="h-1" />
 
-          element={
+      <Suspense fallback={<div className="h-[500px]" />}>
+        <Facilities />
+      </Suspense>
 
-            <>
+      <Suspense fallback={<div className="h-[500px]" />}>
+        <DoctorSection />
+      </Suspense>
 
-              <Home />
+      <Suspense fallback={<div className="h-[500px]" />}>
+        <Testimonial />
+      </Suspense>
 
-              <About />
+      <Suspense fallback={<div className="h-[500px]" />}>
+        <Support />
+      </Suspense>
 
-              <Stats />
+      <Suspense fallback={<div className="h-[500px]" />}>
+        <Newsletter />
+      </Suspense>
 
-              <Services />
-
-              <Facilities />
-
-             <Suspense fallback={<div className="h-[500px]" />}>
-
-  <DoctorSection />
-
-</Suspense>
-
-<Suspense fallback={<div className="h-[500px]" />}>
-
-  <Testimonial />
-
-</Suspense>
-
-              <Support />
-
-              <Newsletter />
-
-              <Footer />
-
-            </>
-
-          }
-
-        />
+      <Suspense fallback={<div className="h-[500px]" />}>
+        <Footer />
+      </Suspense>
+    </>
+  }
+/>
 
 
 

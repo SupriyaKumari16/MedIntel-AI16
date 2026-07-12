@@ -1,4 +1,4 @@
-import React,{useRef,useEffect} from "react";
+import React,{useRef,useEffect, useMemo,} from "react";
 import {FaQuoteLeft,FaChevronLeft,FaChevronRight} from "react-icons/fa";
 import {textReveal} from "../utils/animations";
 
@@ -8,13 +8,15 @@ const headingRef=useRef(null);
 const cardsRef=useRef([]);
 const mobileScrollRef=useRef(null);
 
-const data=[
+const data = useMemo(
+  () => [
 {quote:"This platform has been a game-changer for my health journey.",author:"Sarah Johnson",role:"Patient"},
 {quote:"I’ve learned more about my body in a month than in years.",author:"Priya Patel",role:"Patient"},
 {quote:"The experience is smooth and the guidance is very helpful.",author:"Maria Garcia",role:"Patient"},
 {quote:"Amazing support and clean interface. Loved it!",author:"Neha Sharma",role:"Patient"},
 {quote:"Highly professional doctors and very helpful staff.",author:"Rohit Mehta",role:"Patient"},
-];
+]
+);
 
 useEffect(()=>{
 
@@ -72,10 +74,10 @@ rounded-2xl
 p-5 sm:p-6
 shadow-[0_20px_60px_rgba(0,0,0,0.15)]
 hover:shadow-[0_35px_90px_rgba(0,0,0,0.22)]
-transition-all
+transition-transform transition-shadow
 duration-500
-hover:-translate-y-2
-hover:scale-[1.03]
+hover:-translate-y-1
+hover:scale-[1.02]
 flex
 flex-col
 justify-between
@@ -141,7 +143,7 @@ className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-m
 
 <div
 key={index}
-className="w-[220px] sm:w-[240px] h-[340px] sm:h-[360px] bg-white rounded-2xl p-5 sm:p-6 shadow-[0_20px_60px_rgba(0,0,0,0.15)] flex flex-col justify-between flex-shrink-0 snap-center transition-all duration-500 hover:scale-[1.02]"
+className="w-[220px] sm:w-[240px] h-[340px] sm:h-[360px] bg-white rounded-2xl p-5 sm:p-6 shadow-[0_20px_60px_rgba(0,0,0,0.15)] flex flex-col justify-between flex-shrink-0 snap-center transition-transform transition-shadow duration-500 hover:scale-[1.02]"
 >
 
 <div>
