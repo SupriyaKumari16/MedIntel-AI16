@@ -34,7 +34,7 @@ export default function BookAppointment() {
     try {
 
       const response = await fetch(
-        "http://localhost:5000/api/cases/create",
+        `${import.meta.env.VITE_API_URL}//api/cases/create`,
         {
           method: "POST",
           headers: {
@@ -60,7 +60,7 @@ export default function BookAppointment() {
       }
 
       const aiResponse = await fetch(
-  "http://localhost:5000/api/ai/analyze-initial",
+  `${import.meta.env.VITE_API_URL}/api/ai/analyze-initial`,
   {
     method: "POST",
     headers: {

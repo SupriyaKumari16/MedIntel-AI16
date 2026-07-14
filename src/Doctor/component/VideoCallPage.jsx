@@ -10,7 +10,7 @@ import {
 import { useNavigate, useLocation } from "react-router-dom";
 import { useSocket } from "../../videocall/providers/SocketProvider";
 
-// const SOCKET_URL = "http://localhost:5000";
+
 
 export default function VideoCallPage() {
    console.log("VIDEO CALL PAGE RENDERED");

@@ -20,7 +20,7 @@ export default function DoctorSection() {
     const fetchDoctors = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:5000/api/doctors"
+          `${import.meta.env.VITE_API_URL}/api/doctors`
         );
 
         setDoctors(res.data);

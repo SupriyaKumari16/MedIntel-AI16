@@ -19,7 +19,7 @@ export default function PrescriptionPage() {
         const token = localStorage.getItem("token");
 
         const res = await axios.get(
-          "http://localhost:5000/api/prescriptions/my-prescriptions",
+        `${import.meta.env.VITE_API_URL}/api/prescriptions/my-prescriptions`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

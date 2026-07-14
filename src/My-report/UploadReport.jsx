@@ -24,7 +24,7 @@ export default function UploadReport() {
 
   // 1. AI Analysis
   const aiResponse = await fetch(
-    "http://localhost:5000/api/final-ai/analyze-final",
+    `${import.meta.env.VITE_API_URL}/api/final-ai/analyze-final`,
     {
       method: "POST",
       headers: {
@@ -50,7 +50,7 @@ export default function UploadReport() {
 
   // 2. Save Report
   const response = await fetch(
-    "http://localhost:5000/api/reports/create",
+    `${import.meta.env.VITE_API_URL}/api/reports/create`,
     {
       method: "POST",
       headers: {
