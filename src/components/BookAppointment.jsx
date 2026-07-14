@@ -34,7 +34,7 @@ export default function BookAppointment() {
     try {
 
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}//api/cases/create`,
+        `${import.meta.env.VITE_API_URL}/api/cases/create`,
         {
           method: "POST",
           headers: {
