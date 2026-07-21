@@ -2,21 +2,27 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function DoctorNavbar() {
-
   const navigate = useNavigate();
+
+  const doctor = JSON.parse(localStorage.getItem("user"));
+
+  const handleLogout = () => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  localStorage.removeItem("doctor");
+
+  navigate("/", { replace: true });
+};
 
   return (
     <nav className="w-full bg-white shadow-sm border-b">
-
       <div className="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
 
         {/* Logo */}
-
         <div
           onClick={() => navigate("/")}
           className="flex items-center gap-2 cursor-pointer"
         >
-
           <div className="w-8 h-8 bg-teal-500 rounded-full flex items-center justify-center text-white font-bold">
             +
           </div>
@@ -24,14 +30,10 @@ export default function DoctorNavbar() {
           <h1 className="text-lg font-semibold text-gray-700">
             MedIntel <span className="text-teal-500">AI</span>
           </h1>
-
         </div>
 
-
         {/* Menu */}
-
         <ul className="flex items-center gap-8 text-gray-600 text-sm font-medium">
-
           <li
             onClick={() => navigate("/")}
             className="hover:text-teal-600 cursor-pointer"
@@ -53,30 +55,34 @@ export default function DoctorNavbar() {
           <li className="hover:text-teal-600 cursor-pointer">
             Contact
           </li>
-
         </ul>
 
-
         {/* Doctor Profile */}
-
-        <div className="flex items-center gap-2 cursor-pointer">
-
+        <div className="flex items-center gap-3">
           <img
             src="https://i.pravatar.cc/40?img=12"
             alt="doctor"
-            className="w-8 h-8 rounded-full"
+            className="w-10 h-10 rounded-full"
           />
 
-          <span className="text-sm text-gray-700 font-medium">
-            Dr. Singh
-          </span>
+          <div className="flex flex-col">
+            <span className="text-sm font-semibold text-gray-700">
+              {doctor?.name || "Doctor"}
+            </span>
+            <span className="text-xs text-gray-500">
+              Doctor
+            </span>
+          </div>
 
-          <span className="text-gray-500 text-xs">▼</span>
-
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 hover:bg-red-600 transition text-white px-4 py-2 rounded-lg text-sm"
+          >
+            Logout
+          </button>
         </div>
 
       </div>
-
     </nav>
   );
 }

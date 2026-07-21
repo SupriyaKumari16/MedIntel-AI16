@@ -49,9 +49,9 @@ const handleLogin = async () => {
     alert("Login Successful");
 
     if (data.user.role === "doctor") {
-      navigate("/doctor-dashboard");
+      navigate("/doctor-dashboard", { replace: true });
     } else {
-      navigate("/");
+      navigate("/", { replace: true });
     }
 
   } catch (error) {

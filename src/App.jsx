@@ -9,7 +9,6 @@ import {
   Routes,
   Route,
   useLocation,
-  Navigate,
 } from "react-router-dom";
 
 import {
@@ -70,16 +69,12 @@ import DoctorDetailPage from "./Doctor/Doctorpage/DoctorDetailPage";
 function Layout() {
 
   const location = useLocation();
-  const user = JSON.parse(localStorage.getItem("user"));
+  
 
   const { ref: preloadRef, inView } = useInView({
     triggerOnce: true,
     rootMargin: "600px",
   });
-
-  if (location.pathname === "/" && user?.role === "doctor") {
-    return <Navigate to="/doctor-dashboard" replace />;
-  }
 
   useEffect(() => {
     initLenis();
@@ -116,23 +111,12 @@ function Layout() {
 
 
 
-  const hideNavbar =
-
-    location.pathname.startsWith(
-      "/doctor-dashboard"
-    )
-
-    ||
-
-    location.pathname.startsWith(
-      "/video-call"
-    )
-
-    ||
-
-    location.pathname.startsWith(
-      "/doctor-decision"
-    );
+ const hideNavbar =
+  location.pathname.startsWith("/doctor-dashboard") ||
+  location.pathname.startsWith("/video-call") ||
+  location.pathname.startsWith("/doctor-decision") ||
+  location.pathname.startsWith("/doctor-final-report") ||
+  location.pathname.startsWith("/patient-case");
 
 
   return (

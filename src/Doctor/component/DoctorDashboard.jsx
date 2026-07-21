@@ -4,7 +4,7 @@ import axios from "axios";
 import Footer from "../../components/Footer";
 import { useSocket } from "../../videocall/providers/SocketProvider";
 import useCalling from "../../videocall/hooks/useCalling";
-
+// import DoctorNavbar from "./DoctorNavbar";
 export default function DoctorDashboard() {
   const navigate = useNavigate();
   const socket = useSocket();
@@ -183,17 +183,30 @@ console.log("Patient Object:", patient);
           </ul>
 
           {/* LOGGED-IN DOCTOR */}
-          <div className="flex gap-2 items-center">
-            <img
-              src="https://i.pravatar.cc/40?img=44"
-              className="w-8 h-8 rounded-full object-cover"
-              alt="Doctor"
-            />
+          <div className="flex items-center gap-4">
+  <img
+    src="https://i.pravatar.cc/40?img=44"
+    className="w-8 h-8 rounded-full object-cover"
+    alt="Doctor"
+  />
 
-            <span className="hidden sm:block font-medium">
-              {loggedInUser?.name || "Doctor"}
-            </span>
-          </div>
+  <span className="hidden sm:block font-medium">
+    {loggedInUser?.name || "Doctor"}
+  </span>
+
+  <button
+    onClick={() => {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      localStorage.removeItem("doctor");
+
+      navigate("/", { replace: true });
+    }}
+    className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm"
+  >
+    Logout
+  </button>
+</div>
         </div>
       </nav>
 
