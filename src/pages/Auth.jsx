@@ -190,6 +190,7 @@ className="bg-gradient-to-r from-blue-400 to-blue-500 text-white py-3 rounded-fu
 Login
 
 </button>
+{role === "doctor" && ( <div className="mt-4 bg-gray-50 border border-gray-200 rounded-xl p-3 text-xs text-gray-800 shadow-sm"> <p className="font-semibold mb-2 text-gray-900"> Demo Doctor Accounts </p> <div className="space-y-1"> <div className="bg-white border rounded-md px-3 py-2 text-gray-700 truncate"> doctor1@medintel.com </div> <div className="bg-white border rounded-md px-3 py-2 text-gray-700 truncate"> doctor2@medintel.com </div> <div className="bg-white border rounded-md px-3 py-2 text-gray-700 truncate"> doctor3@medintel.com </div> </div> <div className="mt-2 flex items-center justify-between bg-teal-50 border border-teal-200 rounded-md px-3 py-2"> <span className="text-teal-700 text-[11px]">Password</span> <span className="font-semibold text-teal-900 text-[11px]"> medintel123 </span> </div> </div> )}
 
 
 <p className="text-sm mt-6 text-center">

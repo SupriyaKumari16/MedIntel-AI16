@@ -9,11 +9,21 @@ const needleRef=useRef(null);
 const containerRef=useRef(null);
 const navigate=useNavigate();
 
-const patient=
-location.state||
-JSON.parse(localStorage.getItem("currentPatient"));
+const location = useLocation(); 
+const appointment = location.state;
+const patient = { name: appointment?.name || 'Patient',
+   symptoms: appointment?.symptoms || 'No symptoms',
+    heartRate: appointment?.heartRate || 'N/A',
+     bp: appointment?.bp || 'N/A',
+      oxygen: appointment?.oxygen || 'N/A',
+       aiAnalysis: appointment?.aiAnalysis || {},
+        slot: appointment?.slot || 'N/A',
+         appointmentType: appointment?.appointmentType || 'hospital',
+          doctor: appointment?.doctorName || 'N/A', 
+          risk: appointment?.risk || 'LOW', };
+
 const ai = patient?.aiAnalysis || {};
-const risk = ai?.riskLevel || patient?.risk;
+const risk = ai?.riskLevel || patient?.risk || 'N/A';
 
 
 useEffect(()=>{
@@ -77,21 +87,11 @@ Patient Case
 </h1>
 
 
-<button
-onClick={()=>
-navigate(
-"/doctor-dashboard",
-{
-state:patient
-}
-)
-}
-className="bg-teal-500 text-white px-5 py-2 rounded w-full sm:w-auto"
->
-
-Case Review ✔
-
-</button>
+<button 
+onClick={() => navigate("/doctor-dashboard")}
+ className="bg-teal-500 text-white px-5 py-2 rounded w-full sm:w-auto" >
+   Case Review ✔ 
+   </button>
 
 </div>
 

@@ -291,6 +291,7 @@ function Layout() {
     </ProtectedPatientRoute>
   }
 />
+<Route path="/doctors" element={<DoctorSection />} />
 
 
        <Route

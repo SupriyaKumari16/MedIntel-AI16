@@ -171,12 +171,7 @@ Oxygen: ${oxygen}
   {ai?.specialist}
 </p>
 
-                <button
-                  onClick={() => navigate("/doctor/1", { state: patient })}
-                  className="mt-3 bg-teal-500 text-white px-5 py-2 rounded"
-                >
-                  Consult Doctor
-                </button>
+                <button onClick={() => navigate("/doctors", { state: patient })} className="mt-3 bg-teal-500 text-white px-5 py-2 rounded" > Consult Doctor </button>
               </div>
             )}
           </div>

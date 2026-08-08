@@ -74,21 +74,11 @@ export default function UploadReport() {
     alert(data.message);
     return;
   }
+  localStorage.setItem("latestReportId", data.report._id);
 
   alert("Report Submitted Successfully");
 
-  navigate("/processing", {
-    state: {
-      name: JSON.parse(localStorage.getItem("user"))?.name || "Patient",
-      type: "final",
-      symptoms,
-      heartRate,
-      bp,
-      oxygen,
-      report: file?.name,
-      aiAnalysis: aiData.analysis,
-    },
-  });
+ const reportData = { name: JSON.parse(localStorage.getItem("user"))?.name || "Patient", type: "final", symptoms, heartRate, bp, oxygen, report: file?.name, reportId: data.report._id, aiAnalysis: aiData.analysis, }; localStorage.setItem("latestPatient", JSON.stringify(reportData)); navigate("/processing", { state: reportData, });
 
 }
 catch (error) {

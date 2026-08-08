@@ -11,6 +11,7 @@ const location=useLocation();
 const patient=
 location.state||
 JSON.parse(localStorage.getItem("latestPatient"));
+console.log("CURRENT PATIENT:", patient);
 
 const [activeTab,setActiveTab]=useState("hospital");
 const [selectedDate,setSelectedDate]=useState(0);
@@ -216,30 +217,12 @@ selectedSlot===slot
         return;
       }
 
-     const bookedPatient = {
-  ...patient,
-
-  reportId: patient?.reportId || null,
-
-  doctorId: doctor._id,
-  doctorName: doctor.name || doctor.specialization,
-
-  slot: selectedSlot,
-  appointmentType: activeTab,
-  status: "pending",
-};
+    const latestReportId = localStorage.getItem("latestReportId");
+     const bookedPatient = { ...patient, reportId: latestReportId, doctorId: doctor._id, doctorName: doctor.name || doctor.specialization, slot: selectedSlot, appointmentType: activeTab, status: "pending", };
 
       const token = localStorage.getItem("token");
 
-     const response = await axios.post(
-  `${import.meta.env.VITE_API_URL}/api/appointments/create`,
-  {
-    doctorId: doctor._id,
-    doctorName: doctor.name || doctor.specialization,
-    slot: selectedSlot,
-    appointmentType: activeTab,
-    reportId: patient?.reportId || null,
-  },
+     const response = await axios.post( `${import.meta.env.VITE_API_URL}/api/appointments/create`, { doctorId: doctor._id, doctorName: doctor.name || doctor.specialization, slot: selectedSlot, appointmentType: activeTab, reportId: latestReportId, },
   {
     headers: {
       Authorization: `Bearer ${token}`,

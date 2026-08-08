@@ -71,8 +71,8 @@ console.log("Patient Object:", patient);
 
           // appointment details
           appointmentId: appointment._id,
-          patientId: appointment.patientId?._id,
-          reportId: appointment.reportId?._id || null,
+          patientId: appointment.patientId,
+         reportId: appointment.reportId,
 
           // patient details
           name: appointment.patientId?.name || "Patient",
@@ -92,7 +92,7 @@ console.log("Patient Object:", patient);
           heartRate: appointment.reportId?.heartRate || "N/A",
           bp: appointment.reportId?.bp || "N/A",
           oxygen: appointment.reportId?.oxygen || "N/A",
-          risk: appointment.reportId?.riskLevel || "pending",
+          risk: appointment.reportId?.aiAnalysis?.riskLevel || 'N/A',
           aiAnalysis: appointment.reportId?.aiAnalysis || {},
 
           img: "https://i.pravatar.cc/40?img=5",
@@ -231,82 +231,87 @@ console.log("Patient Object:", patient);
                 </tr>
               </thead>
 
-              <tbody>
-                {patients.map((p) => (
-                  <tr key={p.appointmentId} className="border-t">
-                    <td className="p-4 text-center">
-                      <div className="flex flex-col items-center gap-2">
-                        <img
-                          src={p.img}
-                          className="w-10 h-10 rounded-full"
-                          alt="Patient"
-                        />
+             `<tbody>
+  {patients.map((p) => {
+    console.log("APPOINTMENT DATA:", p);
 
-                        <span>{p.name}</span>
-                      </div>
-                    </td>
+    return (
+      <tr key={p._id} className="border-t">
+        <td className="p-4 text-center">
+          <div className="flex flex-col items-center gap-2">
+            <img
+              src={p.img}
+              className="w-10 h-10 rounded-full"
+              alt="Patient"
+            />
 
-                    <td className="p-4 text-center">
-                      {p.slot}
-                    </td>
+            <span>{p.name}</span>
+          </div>
+        </td>
 
-                    <td className="p-4 text-center capitalize">
-                      {p.appointmentType}
-                    </td>
+        <td className="p-4 text-center">
+          {p.slot}
+        </td>
 
-                    <td className="p-4 text-center">
-                      <button
-                        onClick={() =>
-                          navigate("/patient-case", {
-                            state: p,
-                          })
-                        }
-                        className="bg-blue-500 text-white px-4 py-2 rounded"
-                      >
-                        View
-                      </button>
-                    </td>
+        <td className="p-4 text-center capitalize">
+          {p.appointmentType}
+        </td>
 
-                    <td className="p-4 text-center">
-                      <button
-                        onClick={() => handleCall(p)}
-                        className="bg-teal-500 text-white px-4 py-2 rounded"
-                      >
-                        Call
-                      </button>
-                    </td>
+        <td className="p-4 text-center">
+          <button
+            onClick={() =>
+              navigate("/patient-case", {
+                state: p,
+              })
+            }
+            className="bg-blue-500 text-white px-4 py-2 rounded"
+          >
+            View
+          </button>
+        </td>
 
-                    <td className="p-4 text-center">
-                      <button
-                        onClick={() =>
-                          navigate("/doctor-decision", {
-                            state: p,
-                          })
-                        }
-                        className="bg-orange-500 text-white px-4 py-2 rounded"
-                      >
-                        Decision
-                      </button>
-                    </td>
+        <td className="p-4 text-center">
+          <button
+            onClick={() => handleCall(p)}
+            className="bg-teal-500 text-white px-4 py-2 rounded"
+          >
+            Call
+          </button>
+        </td>
 
-                    <td className="p-4 text-center">
-                      <span
-                        className={`px-3 py-1 rounded capitalize ${
-                          p.status === "completed"
-                            ? "bg-green-100 text-green-700"
-                            : p.status === "cancelled"
-                            ? "bg-red-100 text-red-700"
-                            : p.status === "accepted"
-                            ? "bg-blue-100 text-blue-700"
-                            : "bg-yellow-100 text-yellow-700"
-                        }`}
-                      >
-                        {p.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
+        <td className="p-4 text-center">
+          <button
+            onClick={() =>
+              navigate("/doctor-decision", {
+                state: p,
+              })
+            }
+            className="bg-orange-500 text-white px-4 py-2 rounded"
+          >
+            Decision
+          </button>
+        </td>
+
+        <td className="p-4 text-center">
+          <span
+            className={
+              "px-3 py-1 rounded capitalize " +
+              (p.status === "completed"
+                ? "bg-green-100 text-green-700"
+                : p.status === "cancelled"
+                ? "bg-red-100 text-red-700"
+                : p.status === "accepted"
+                ? "bg-blue-100 text-blue-700"
+                : "bg-yellow-100 text-yellow-700")
+            }
+          >
+            {p.status}
+          </span>
+        </td>
+      </tr>
+    );
+  })}
+</tbody>`
             </table>
 
             {loading && (
