@@ -13,6 +13,7 @@ An AI-powered healthcare platform built with the **MERN stack** that helps patie
 ## 📌 Key Features
 
 ### 👤 Patient Features
+
 - AI symptom analysis
 - AI final report analysis
 - Upload medical reports (PDF/JPG/PNG)
@@ -23,6 +24,7 @@ An AI-powered healthcare platform built with the **MERN stack** that helps patie
 - Chat with AI assistant
 
 ### 🩺 Doctor Features
+
 - Secure doctor login
 - View patient cases
 - Access uploaded reports
@@ -35,20 +37,20 @@ An AI-powered healthcare platform built with the **MERN stack** that helps patie
 
 ## 🧠 AI Workflow
 
-Patient enters symptoms
-        ↓
-Initial AI Analysis
-        ↓
-Recommended medical tests
-        ↓
-Patient uploads reports
-        ↓
-Final AI Analysis
-        ↓
-Risk classification
-        ↓
-Doctor consultation
-        ↓
+Patient enters symptoms  
+↓  
+Initial AI Analysis  
+↓  
+Recommended medical tests  
+↓  
+Patient uploads reports  
+↓  
+Final AI Analysis  
+↓  
+Risk classification  
+↓  
+Doctor consultation  
+↓  
 Prescription generation
 
 ---
@@ -56,6 +58,7 @@ Prescription generation
 ## 🛠️ Tech Stack
 
 ### Frontend
+
 - React + Vite
 - Tailwind CSS
 - Framer Motion
@@ -64,6 +67,7 @@ Prescription generation
 - React Router
 
 ### Backend
+
 - Node.js
 - Express.js
 - MongoDB + Mongoose
@@ -72,26 +76,20 @@ Prescription generation
 - WebRTC
 
 ### AI
+
 - Google Gemini API
-
----
-
-## 🔐 Demo Accounts
-
-### 👨‍⚕️ Doctor Login
-- **Email:** diana@medintel.com
-- **Password:** 123456
-- **Role:** Doctor
-
-### 👤 Patient Login
-- Create a new patient account from the signup page.
 
 ---
 
 ## 📂 Project Structure
 
-frontend/
-backend/
+```text
+medintel/
+├── src/              # Frontend (React + Vite)
+├── backend/          # Backend (Node.js + Express)
+├── public/           # Static assets
+└── README.md
+```
 
 ---
 
@@ -99,51 +97,38 @@ backend/
 
 ### Clone the repository
 
-\`\`\`bash
-git clone https://github.com/YOUR_USERNAME/medintel.git
-cd medintel
-\`\`\`
+```bash
+git clone https://github.com/SupriyaKumari16/MedIntel-AI16.git
+cd MedIntel-AI16
+```
 
 ### Frontend
 
-\`\`\`bash
-cd frontend
+```bash
 npm install
 npm run dev
-\`\`\`
+```
 
 ### Backend
 
-\`\`\`bash
+```bash
 cd backend
 npm install
 npm run dev
-\`\`\`
+```
 
 ---
 
 ## 🔑 Environment Variables
 
-Create a \`.env\` file in the backend folder.
+Create a `.env` file in the backend folder.
 
-\`\`\`env
+```env
 PORT=5000
 MONGO_URI=your_mongodb_connection
 JWT_SECRET=your_jwt_secret
 GEMINI_API_KEY=your_gemini_api_key
-\`\`\`
-
----
-
-## 📸 Screenshots
-
-Add screenshots of:
-- Home Page
-- AI Analysis
-- Upload Report
-- Doctor Dashboard
-- Video Call
-- Prescription Page
+```
 
 ---
 
@@ -162,8 +147,8 @@ Add screenshots of:
 
 **Supriya Kumari**
 
-- GitHub: https://github.com/YOUR_USERNAME
-- LinkedIn: https://linkedin.com/in/YOUR_LINKEDIN
+- GitHub: https://github.com/SupriyaKumari16
+- LinkedIn: https://www.linkedin.com/in/supriya-kumari16/
 
 ---
 
