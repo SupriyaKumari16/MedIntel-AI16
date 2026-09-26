@@ -141,7 +141,9 @@ GEMINI_API_KEY=your_gemini_api_key
 - Responsive UI
 - Production deployment
 
----
+---## Deployment
+
+MedIntel is deployed using Vercel with SPA routing support.
 
 ## 👩‍💻 Author
 
